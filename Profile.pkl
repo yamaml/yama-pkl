@@ -1,0 +1,261 @@
+/// YAMA Profile schema — typed PKL classes for authoring YAMA
+/// (Yet Another Metadata Application Profile and RDF Mapping Language) profiles.
+///
+/// YAMA profiles describe the structure and constraints of metadata records.
+/// A single YAMA profile can be transformed into RDF, SHACL, ShEx, OWL-DSP,
+/// SimpleDSP, DCTAP, diagrams, and Frictionless Data Packages.
+///
+/// This module is used with [amends] to fill in a profile:
+///
+/// ```
+/// amends "package://pkg.pkl-lang.org/github.com/yamaml/yama-pkl/yama@0.1.0#/Profile.pkl"
+///
+/// base = "http://example.org/people/"
+///
+/// namespaces {
+///   ["foaf"] = "http://xmlns.com/foaf/0.1/"
+///   ["xsd"]  = "http://www.w3.org/2001/XMLSchema#"
+/// }
+///
+/// descriptions {
+///   ["person"] = new Description {
+///     a = "foaf:Person"
+///     statements {
+///       ["name"] = new LiteralStatement {
+///         property = "foaf:name"
+///         min = 1
+///         max = 1
+///         datatype = "xsd:string"
+///       }
+///     }
+///   }
+/// }
+/// ```
+///
+/// Render to YAMAML for use with the `yama` CLI:
+///
+/// ```
+/// pkl eval -f yaml profile.pkl > profile.yaml
+/// yama package -i profile.yaml -o dist/
+/// ```
+open module yama.Profile
+
+/// Base IRI for the application profile. Used as the namespace for
+/// description and statement IRIs in generated outputs.
+base: String?
+
+/// Prefix-to-IRI namespace declarations used throughout the profile
+/// for compact IRI notation (prefixed names).
+namespaces: Mapping<String, String> = new Mapping {}
+
+/// Default values inherited by all descriptions and statements.
+defaults: Defaults?
+
+/// Inline data records referenced by data mappings with `source = "data"`.
+data: Listing<Mapping<String, Any>>?
+
+/// The set of description definitions that form the application profile.
+descriptions: Mapping<String, Description>
+
+// ── Descriptions ────────────────────────────────────────────────
+
+/// A description defines a class of resources — the equivalent of a
+/// shape, template, or record type.
+open class Description {
+  /// The RDF class (`rdf:type`) of the described resource.
+  /// Accepts a prefixed name or a full IRI.
+  a: String?
+
+  /// Human-readable label for the description.
+  /// Used in SHACL (`sh:name`), DSP (`rdfs:label`), DCTAP (`shapeLabel`),
+  /// and diagrams.
+  label: String?
+
+  /// Documentation or explanatory text.
+  /// Used in SHACL (`sh:description`), DSP (`rdfs:comment`), DCTAP (`note`).
+  note: String?
+
+  /// Identifier configuration for data-mapped descriptions.
+  id: IdMapping?
+
+  /// The set of statement definitions for this description.
+  statements: Mapping<String, Statement> = new Mapping {}
+
+  /// When true, the description is treated as a closed shape in SHACL
+  /// (`sh:closed true`), meaning only the declared properties are permitted.
+  closed: Boolean = false
+}
+
+// ── Statements ──────────────────────────────────────────────────
+
+/// Base statement class — use one of the typed subclasses
+/// ([LiteralStatement], [IriStatement], [BnodeStatement]).
+abstract class Statement {
+  /// The RDF property (predicate). Accepts a prefixed name or a full IRI.
+  property: String
+
+  /// Human-readable label.
+  /// Used in SHACL (`sh:name`), DSP (`rdfs:label`),
+  /// DCTAP (`propertyLabel`), SimpleDSP (`ItemRuleName`).
+  label: String?
+
+  /// Documentation text.
+  /// Used in SHACL (`sh:description`), DSP (`rdfs:comment`),
+  /// DCTAP/SimpleDSP (`Comment`).
+  note: String?
+
+  /// Minimum cardinality. `0` = optional, `1` = required.
+  min: Int?(this == null || this >= 0)
+
+  /// Maximum cardinality. Absence means unbounded.
+  max: Int?(this == null || this >= 0)
+
+  /// Descriptive cardinality keyword (e.g. "recommended", "conditional").
+  /// Preserved in OWL-DSP as `dsp:cardinalityNote`. When present,
+  /// [min] and [max] MAY be absent.
+  cardinalityNote: String?
+
+  /// Data source mapping for RDF generation.
+  mapping: DataMapping?
+}
+
+/// A literal-valued statement (text, number, date, picklist, pattern).
+class LiteralStatement extends Statement {
+  /// Fixed to `"literal"` — identifies this as a literal statement.
+  fixed `type`: "literal" = "literal"
+
+  /// XSD datatype constraint (e.g. `"xsd:string"`, `"xsd:date"`).
+  datatype: String?
+
+  /// Enumerated allowed values (picklist).
+  values: Listing<String>?
+
+  /// Regular expression constraint on the value.
+  pattern: String?
+
+  /// Numeric and string facets (XSD semantics).
+  facets: Facets?
+}
+
+/// An IRI-valued statement — a URI/IRI reference, optionally linked
+/// to another description or constrained to a vocabulary scheme.
+class IriStatement extends Statement {
+  /// Fixed to `"IRI"` — identifies this as an IRI statement.
+  fixed `type`: "IRI" = "IRI"
+
+  /// Name of another description this statement references.
+  /// Creates a typed link to another described resource.
+  description: String?
+
+  /// Enumerated allowed URI values.
+  values: Listing<String>?
+
+  /// Vocabulary scheme reference(s). A scheme prefix ending with `:`
+  /// denotes a namespace constraint. Accepts a single prefix or a
+  /// list of prefixes.
+  inScheme: (String | Listing<String>)?
+}
+
+/// A blank-node statement — an inline structured value defined by
+/// a nested description. MUST be combined with [description].
+class BnodeStatement extends Statement {
+  /// Fixed to `"BNODE"` — identifies this as a blank-node statement.
+  fixed `type`: "BNODE" = "BNODE"
+
+  /// Required name of the nested description defining the blank node's
+  /// structure.
+  description: String
+}
+
+// ── Facets ──────────────────────────────────────────────────────
+
+/// Numeric and string facet constraints following XSD facet semantics.
+class Facets {
+  /// Minimum value (inclusive).
+  MinInclusive: Number?
+
+  /// Maximum value (inclusive).
+  MaxInclusive: Number?
+
+  /// Minimum value (exclusive).
+  MinExclusive: Number?
+
+  /// Maximum value (exclusive).
+  MaxExclusive: Number?
+
+  /// Minimum string length.
+  MinLength: Int?(this == null || this >= 0)
+
+  /// Maximum string length.
+  MaxLength: Int?(this == null || this >= 0)
+
+  /// Exact string length.
+  Length: Int?(this == null || this >= 0)
+
+  /// Maximum total digits.
+  TotalDigits: Int?(this == null || this >= 0)
+
+  /// Maximum fraction digits.
+  FractionDigits: Int?(this == null || this >= 0)
+}
+
+// ── Data mapping ────────────────────────────────────────────────
+
+/// Identifier mapping for descriptions that participate in RDF
+/// generation from tabular or structured data sources.
+class IdMapping {
+  /// A namespace prefix declared in [Profile.namespaces] that provides
+  /// the base URI for record identifiers. When omitted, the identifier
+  /// value is appended to the document [Profile.base].
+  prefix: String?
+
+  /// Data source mapping. The `path` field identifies the column or
+  /// field that provides the unique identifier for each record.
+  mapping: DataMapping?
+}
+
+/// Data source mapping for extracting values from tabular or
+/// structured data sources.
+class DataMapping {
+  /// Path to the data source file, URL, or `"data"` for inline data.
+  source: String?
+
+  /// Source format. Inferred from the file extension if omitted.
+  `type`: ("csv" | "xlsx" | "json" | "yaml" | "yml")?
+
+  /// Field name or JSONata expression for extracting the value
+  /// from each record.
+  path: String?
+
+  /// Characters to remove from extracted values.
+  strip: Listing<String>?
+
+  /// Substitution pairs `[from, to]` applied in order.
+  replace: Listing<Listing<String>>?
+
+  /// Character to split a multi-valued field into separate values.
+  separator: String?
+
+  /// String prepended to each extracted value.
+  prepend: String?
+
+  /// String appended to each extracted value.
+  append: String?
+}
+
+// ── Defaults ────────────────────────────────────────────────────
+
+/// Default values inherited by all descriptions and statements.
+class Defaults {
+  /// Default data source mapping. Merged with statement-level
+  /// mappings — statement-level values override defaults.
+  mapping: DataMapping?
+}
+
+// ── Render hook ─────────────────────────────────────────────────
+
+// Render as YAML by default: `pkl eval -f yaml profile.pkl` produces
+// a valid YAMAML document.
+output {
+  renderer = new YamlRenderer {}
+}

@@ -1,0 +1,15 @@
+# PKL build output
+.out/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# AI assistant config
+CLAUDE.md

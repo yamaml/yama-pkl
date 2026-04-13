@@ -1,0 +1,40 @@
+/// yama — Typed PKL schema for authoring YAMA profiles.
+///
+/// YAMA (Yet Another Metadata Application Profile and RDF Mapping Language)
+/// profiles describe the structure and constraints of metadata records.
+/// This package provides a type-safe PKL layer that renders to YAMAML.
+///
+/// See https://docs.yamaml.org for documentation.
+amends "pkl:Project"
+
+package {
+  name = "yama"
+  version = "0.1.0"
+  baseUri = "package://pkg.pkl-lang.org/github.com/yamaml/yama-pkl/\(name)"
+  packageZipUrl =
+    "https://github.com/yamaml/yama-pkl/releases/download/\(name)@\(version)/\(name)@\(version).zip"
+  description =
+    "Typed PKL schema for authoring YAMA (Yet Another Metadata Application Profile and RDF Mapping Language) profiles. Renders to YAMAML for use with the yama CLI."
+  authors {
+    "Nishad Thalhath <nishad@users.noreply.github.com>"
+  }
+  license = "MIT"
+  sourceCode = "https://github.com/yamaml/yama-pkl"
+  sourceCodeUrlScheme =
+    "https://github.com/yamaml/yama-pkl/blob/\(name)@\(version)%{path}#L%{line}-L%{endLine}"
+  documentation = "https://docs.yamaml.org/specs/yamaml/pkl"
+  issueTracker = "https://github.com/yamaml/yama-pkl/issues"
+  apiTests {
+    "tests/Profile.test.pkl"
+  }
+  exclude {
+    "examples/**"
+    "tests/**"
+    ".github/**"
+    ".gitignore"
+    "README.md"
+    "LICENSE"
+    "*.zip"
+    "*.json"
+  }
+}
