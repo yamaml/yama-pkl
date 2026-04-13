@@ -143,8 +143,8 @@ via PKL's [`pkg.pkl-lang.org` redirect service](https://github.com/apple/pkl/dis
 
 ## Documentation
 
-Full reference documentation lives at **https://yamaml.org/docs/yamaml/pkl**.
+Full reference documentation lives at **https://docs.yamaml.org/specs/yamaml/pkl**.
 
 ## License
 
-[Creative Commons Attribution-ShareAlike 4.0 International](LICENSE) (CC BY-SA 4.0).
+[MIT](LICENSE)
