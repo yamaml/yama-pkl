@@ -1,0 +1,122 @@
+/// Example: The Big Bang Theory characters.
+///
+/// Demonstrates a simple profile with:
+/// - A single [MAIN] description for persons
+/// - A structured blank-node sub-description for addresses
+/// - Literal, IRI, and BNODE statements
+///
+/// Render: `pkl eval -f yaml tbbt-characters.pkl > tbbt-characters.yaml`
+amends "../Profile.pkl"
+
+base = "http://purl.org/yama/examples/2022/tbbt/0.1/"
+
+namespaces {
+  ["schema"] = "http://schema.org/"
+  ["foaf"] = "http://xmlns.com/foaf/0.1/"
+  ["xsd"] = "http://www.w3.org/2001/XMLSchema#"
+  ["rdfs"] = "http://www.w3.org/2000/01/rdf-schema#"
+}
+
+descriptions {
+  ["person"] = new Description {
+    a = "foaf:Person"
+    label = "Character"
+    note = "Details of the character"
+    statements {
+      ["name"] = new LiteralStatement {
+        label = "Name"
+        property = "foaf:name"
+        min = 1
+        max = 1
+        datatype = "xsd:string"
+        note = "Full name of the character"
+      }
+      ["familyName"] = new LiteralStatement {
+        label = "Family Name"
+        property = "foaf:familyName"
+        min = 1
+        max = 1
+        datatype = "xsd:string"
+      }
+      ["firstName"] = new LiteralStatement {
+        label = "First Name"
+        property = "foaf:firstName"
+        min = 1
+        max = 1
+        datatype = "xsd:string"
+      }
+      ["jobTitle"] = new LiteralStatement {
+        label = "Job Title"
+        property = "schema:jobTitle"
+        min = 0
+        max = 1
+        datatype = "xsd:string"
+      }
+      ["parents"] = new IriStatement {
+        label = "Parents"
+        property = "schema:parent"
+        min = 0
+        description = "person"
+      }
+      ["children"] = new IriStatement {
+        label = "Children"
+        property = "schema:children"
+        min = 0
+        description = "person"
+      }
+      ["knows"] = new IriStatement {
+        label = "Knows"
+        property = "foaf:knows"
+        min = 0
+        description = "person"
+      }
+      ["wikidata"] = new IriStatement {
+        label = "Wikidata"
+        property = "rdfs:seeAlso"
+        min = 0
+        note = "Wikidata entity for this character"
+      }
+      ["homeAddress"] = new BnodeStatement {
+        label = "Home Address"
+        property = "schema:address"
+        min = 0
+        max = 1
+        description = "address"
+      }
+      ["portrayedBy"] = new IriStatement {
+        label = "Portrayed by"
+        property = "schema:byArtist"
+        min = 0
+        max = 1
+        note = "Actor who portrays this character"
+      }
+    }
+  }
+
+  ["address"] = new Description {
+    a = "schema:PostalAddress"
+    label = "Address"
+    statements {
+      ["street"] = new LiteralStatement {
+        property = "schema:streetAddress"
+        datatype = "xsd:string"
+      }
+      ["locality"] = new LiteralStatement {
+        property = "schema:addressLocality"
+        datatype = "xsd:string"
+      }
+      ["region"] = new LiteralStatement {
+        property = "schema:addressRegion"
+        datatype = "xsd:string"
+      }
+      ["country"] = new LiteralStatement {
+        property = "schema:addressCountry"
+        datatype = "xsd:string"
+      }
+      ["postalCode"] = new LiteralStatement {
+        property = "schema:postalCode"
+        datatype = "xsd:string"
+      }
+    }
+  }
+}

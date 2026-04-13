@@ -1,0 +1,87 @@
+/// Example: Products — rich constraints (picklist, pattern, facets, closed shape).
+amends "../Profile.pkl"
+
+base = "http://example.org/products/"
+
+namespaces {
+  ["schema"] = "http://schema.org/"
+  ["xsd"] = "http://www.w3.org/2001/XMLSchema#"
+}
+
+descriptions {
+  ["product"] = new Description {
+    a = "schema:Product"
+    label = "Product"
+    closed = true
+    statements {
+      ["name"] = new LiteralStatement {
+        label = "Name"
+        property = "schema:name"
+        min = 1
+        max = 1
+        datatype = "xsd:string"
+      }
+      ["price"] = new LiteralStatement {
+        label = "Price"
+        property = "schema:price"
+        min = 1
+        max = 1
+        datatype = "xsd:decimal"
+        facets = new Facets {
+          MinInclusive = 0
+          MaxInclusive = 999999.99
+        }
+      }
+      ["sku"] = new LiteralStatement {
+        label = "SKU"
+        property = "schema:sku"
+        min = 1
+        max = 1
+        datatype = "xsd:string"
+        pattern = #"^[A-Z]{3}-\d{6}$"#
+        facets = new Facets {
+          Length = 10
+        }
+      }
+      ["category"] = new LiteralStatement {
+        label = "Category"
+        property = "schema:category"
+        min = 1
+        max = 1
+        values {
+          "electronics"
+          "clothing"
+          "books"
+          "food"
+        }
+      }
+      ["manufacturer"] = new IriStatement {
+        label = "Manufacturer"
+        property = "schema:manufacturer"
+        min = 0
+        max = 1
+        description = "organization"
+      }
+    }
+  }
+
+  ["organization"] = new Description {
+    a = "schema:Organization"
+    label = "Organization"
+    statements {
+      ["name"] = new LiteralStatement {
+        label = "Name"
+        property = "schema:name"
+        min = 1
+        max = 1
+        datatype = "xsd:string"
+      }
+      ["url"] = new IriStatement {
+        label = "Website"
+        property = "schema:url"
+        min = 0
+        max = 1
+      }
+    }
+  }
+}

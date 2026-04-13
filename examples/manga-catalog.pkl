@@ -1,0 +1,93 @@
+/// Example: Manga catalog — multi-description profile without data mapping.
+///
+/// Demonstrates linked descriptions: series references creator and volume
+/// via IRI statements, each as its own description template.
+amends "../Profile.pkl"
+
+base = "http://example.org/manga/"
+
+namespaces {
+  ["schema"] = "http://schema.org/"
+  ["xsd"] = "http://www.w3.org/2001/XMLSchema#"
+  ["dcterms"] = "http://purl.org/dc/terms/"
+  ["foaf"] = "http://xmlns.com/foaf/0.1/"
+}
+
+descriptions {
+  ["series"] = new Description {
+    a = "schema:ComicSeries"
+    label = "Manga Series"
+    note = "A manga series or title"
+    statements {
+      ["title"] = new LiteralStatement {
+        label = "Title"
+        property = "schema:name"
+        min = 1
+        max = 1
+        datatype = "xsd:string"
+      }
+      ["genre"] = new LiteralStatement {
+        label = "Genre"
+        property = "schema:genre"
+        min = 1
+        datatype = "xsd:string"
+      }
+      ["author"] = new IriStatement {
+        label = "Author"
+        property = "schema:author"
+        min = 1
+        description = "creator"
+      }
+      ["volume"] = new IriStatement {
+        label = "Volumes"
+        property = "schema:hasPart"
+        min = 1
+        description = "volume"
+      }
+    }
+  }
+
+  ["volume"] = new Description {
+    a = "schema:Book"
+    label = "Volume"
+    note = "A single volume of a manga series"
+    statements {
+      ["volumeNumber"] = new LiteralStatement {
+        label = "Volume Number"
+        property = "schema:volumeNumber"
+        min = 1
+        max = 1
+        datatype = "xsd:integer"
+      }
+      ["datePublished"] = new LiteralStatement {
+        label = "Date Published"
+        property = "schema:datePublished"
+        min = 1
+        max = 1
+        datatype = "xsd:date"
+      }
+    }
+  }
+
+  ["creator"] = new Description {
+    a = "foaf:Person"
+    label = "Creator"
+    note = "A manga author or artist"
+    statements {
+      ["name"] = new LiteralStatement {
+        label = "Name"
+        property = "schema:name"
+        min = 1
+        max = 1
+        datatype = "xsd:string"
+      }
+      ["birthDate"] = new LiteralStatement {
+        label = "Birth Date"
+        property = "schema:birthDate"
+        min = 0
+        max = 1
+        datatype = "xsd:date"
+      }
+    }
+  }
+}

@@ -1,0 +1,81 @@
+/// Basic smoke tests for the Profile schema.
+amends "pkl:test"
+
+import "../Profile.pkl" as YamaProfile
+
+local minimalProfile: YamaProfile = new YamaProfile {
+  descriptions {
+    ["thing"] = new YamaProfile.Description {
+      a = "schema:Thing"
+      statements {
+        ["name"] = new YamaProfile.LiteralStatement {
+          property = "schema:name"
+          datatype = "xsd:string"
+        }
+      }
+    }
+  }
+}
+
+local structuredProfile: YamaProfile = new YamaProfile {
+  base = "http://example.org/"
+  namespaces {
+    ["foaf"] = "http://xmlns.com/foaf/0.1/"
+  }
+  descriptions {
+    ["person"] = new YamaProfile.Description {
+      a = "foaf:Person"
+      statements {
+        ["knows"] = new YamaProfile.IriStatement {
+          property = "foaf:knows"
+          description = "person"
+        }
+        ["address"] = new YamaProfile.BnodeStatement {
+          property = "foaf:address"
+          description = "address"
+        }
+      }
+    }
+    ["address"] = new YamaProfile.Description {
+      statements {
+        ["street"] = new YamaProfile.LiteralStatement {
+          property = "schema:streetAddress"
+        }
+      }
+    }
+  }
+}
+
+facts {
+  ["a minimal profile has descriptions"] {
+    minimalProfile.descriptions.length > 0
+  }
+
+  ["LiteralStatement sets type automatically"] {
+    minimalProfile.descriptions["thing"].statements["name"].`type` == "literal"
+  }
+
+  ["IriStatement sets type automatically"] {
+    structuredProfile.descriptions["person"].statements["knows"].`type` == "IRI"
+  }
+
+  ["BnodeStatement sets type automatically"] {
+    structuredProfile.descriptions["person"].statements["address"].`type` == "BNODE"
+  }
+
+  ["default closed is false"] {
+    minimalProfile.descriptions["thing"].closed == false
+  }
+
+  ["default namespaces is empty"] {
+    minimalProfile.namespaces.length == 0
+  }
+
+  ["base can be set"] {
+    structuredProfile.base == "http://example.org/"
+  }
+
+  ["namespaces are preserved"] {
+    structuredProfile.namespaces["foaf"] == "http://xmlns.com/foaf/0.1/"
+  }
+}
