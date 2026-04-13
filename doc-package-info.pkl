@@ -1,0 +1,11 @@
+amends "pkl:DocPackageInfo"
+
+name = "yama"
+version = "0.1.0"
+importUri = "package://pkg.pkl-lang.org/github.com/yamaml/yama-pkl/yama@0.1.0#/"
+sourceCode = "https://github.com/yamaml/yama-pkl"
+sourceCodeUrlScheme = "https://github.com/yamaml/yama-pkl/blob/yama@\(version)%{path}#L%{line}-L%{endLine}"
+issueTracker = "https://github.com/yamaml/yama-pkl/issues"
+authors {
+  "Nishad Thalhath <nishad@users.noreply.github.com>"
+}

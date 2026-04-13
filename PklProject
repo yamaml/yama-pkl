@@ -34,6 +34,7 @@ package {
     ".gitignore"
     "README.md"
     "LICENSE"
+    "doc-package-info.pkl"
     "*.zip"
     "*.json"
   }

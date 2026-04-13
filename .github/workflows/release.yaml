@@ -77,7 +77,7 @@ jobs:
 
       - name: Generate API docs
         run: |
-          jpkldoc -o docs/ Profile.pkl
+          jpkldoc -o docs/ doc-package-info.pkl Profile.pkl
 
       - uses: actions/upload-pages-artifact@v3
         with:
