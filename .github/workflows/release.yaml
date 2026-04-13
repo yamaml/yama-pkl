@@ -74,11 +74,15 @@ jobs:
           sudo mv jpkldoc /usr/local/bin/
 
       - name: Generate API docs
+        timeout-minutes: 3
         env:
           TAG: ${{ github.ref_name }}
         run: |
           PACKAGE_URI="package://pkg.pkl-lang.org/github.com/yamaml/yama-pkl/yama@${TAG#yama@}"
-          jpkldoc -o docs/ "$PACKAGE_URI"
+          echo "Generating docs for: $PACKAGE_URI"
+          jpkldoc --timeout 60 -o docs/ "$PACKAGE_URI"
+          echo "Generated files:"
+          find docs/ -type f | head -20
 
       - uses: actions/upload-pages-artifact@v3
         with:
