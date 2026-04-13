@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install PKL
+        run: |
+          curl -L -o pkl https://github.com/apple/pkl/releases/latest/download/pkl-linux-amd64
+          chmod +x pkl
+          sudo mv pkl /usr/local/bin/
+          pkl --version
+
+      - name: Validate Profile schema
+        run: pkl eval Profile.pkl
+
+      - name: Run tests
+        run: pkl test tests/Profile.test.pkl
+
+      - name: Validate examples
+        run: |
+          for f in examples/*.pkl; do
+            echo "→ $f"
+            pkl eval -f yaml "$f" > /dev/null
+          done
+
+      - name: Validate PklProject manifest
+        run: pkl eval PklProject
