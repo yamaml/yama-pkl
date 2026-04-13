@@ -9,6 +9,8 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 jobs:
   release:
@@ -52,3 +54,36 @@ jobs:
             ".out/yama@$VERSION/yama@$VERSION.zip.sha256" \
             ".out/yama@$VERSION/yama@$VERSION" \
             ".out/yama@$VERSION/yama@$VERSION.sha256"
+
+  docs:
+    runs-on: ubuntu-latest
+    needs: release
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install jpkldoc
+        run: |
+          curl -L -o jpkldoc https://github.com/apple/pkl/releases/latest/download/jpkldoc
+          chmod +x jpkldoc
+          sudo mv jpkldoc /usr/local/bin/
+
+      - name: Generate API docs
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          PACKAGE_URI="package://pkg.pkl-lang.org/github.com/yamaml/yama-pkl/yama@${TAG#yama@}"
+          jpkldoc -o docs/ "$PACKAGE_URI"
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
