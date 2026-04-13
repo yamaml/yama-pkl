@@ -1,3 +1,8 @@
+/// Typed PKL schema for authoring YAMA (Yet Another Metadata Application Profile
+/// and RDF Mapping Language) profiles. Provides editor autocomplete, authoring-time
+/// validation, and modular composition for YAMAML documents.
+///
+/// See <https://docs.yamaml.org/specs/yamaml/pkl> for usage documentation.
 amends "pkl:DocPackageInfo"
 
 name = "yama"
