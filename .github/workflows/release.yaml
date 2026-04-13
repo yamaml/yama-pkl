@@ -80,9 +80,14 @@ jobs:
         run: |
           PACKAGE_URI="package://pkg.pkl-lang.org/github.com/yamaml/yama-pkl/yama@${TAG#yama@}"
           echo "Generating docs for: $PACKAGE_URI"
-          jpkldoc --timeout 60 -o docs/ "$PACKAGE_URI"
-          echo "Generated files:"
-          find docs/ -type f | head -20
+          timeout 120 jpkldoc -o docs/ "$PACKAGE_URI" || true
+          if [ -f docs/index.html ]; then
+            echo "Docs generated successfully"
+            find docs/ -name '*.html' | wc -l
+          else
+            echo "::error::Doc generation failed — no output"
+            exit 1
+          fi
 
       - uses: actions/upload-pages-artifact@v3
         with:
