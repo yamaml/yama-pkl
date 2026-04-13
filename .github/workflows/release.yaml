@@ -69,22 +69,15 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Install PKL and jpkldoc
+      - name: Install jpkldoc
         run: |
-          curl -L -o pkl https://github.com/apple/pkl/releases/latest/download/pkl-linux-amd64
-          chmod +x pkl
-          sudo mv pkl /usr/local/bin/
           curl -L -o jpkldoc https://github.com/apple/pkl/releases/latest/download/jpkldoc
           chmod +x jpkldoc
           sudo mv jpkldoc /usr/local/bin/
 
-      - name: Build package and generate API docs
-        env:
-          TAG: ${{ github.ref_name }}
+      - name: Generate API docs
         run: |
-          pkl project package
-          PACKAGE_URI="package://pkg.pkl-lang.org/github.com/yamaml/yama-pkl/yama@${TAG#yama@}"
-          jpkldoc -o docs/ "$PACKAGE_URI"
+          jpkldoc -o docs/ Profile.pkl
 
       - uses: actions/upload-pages-artifact@v3
         with:
