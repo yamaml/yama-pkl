@@ -1,0 +1,69 @@
+/// Example: Multi-shape valueShape disjunction (DCMI SRAP pattern).
+///
+/// A property whose value may be one of several shapes — here, `creator`
+/// may point to a `Person` or an `Organization`. Renders to:
+///   - YAMAML: `description: [Person, Organization]`
+///   - DCTAP:  `valueShape: Person Organization`
+///   - SHACL:  `sh:or` with a list of `sh:node` blank nodes
+///   - ShEx:   `(@<Person> OR @<Organization>)`
+///   - OWL-DSP: `owl:unionOf` wrapping the shape IRIs
+amends "../Profile.pkl"
+
+base = "http://example.org/srap/"
+
+namespaces {
+  ["dcterms"] = "http://purl.org/dc/terms/"
+  ["foaf"] = "http://xmlns.com/foaf/0.1/"
+  ["xsd"] = "http://www.w3.org/2001/XMLSchema#"
+}
+
+descriptions {
+  ["Work"] = new Description {
+    label = "Work"
+    note = "A creative work with a creator and a title"
+    statements {
+      ["title"] = new LiteralStatement {
+        label = "Title"
+        property = "dcterms:title"
+        min = 1
+        max = 1
+        datatype = "xsd:string"
+      }
+      ["creator"] = new IriStatement {
+        label = "Creator"
+        property = "dcterms:creator"
+        min = 0
+        note = "A creator, either a person or an organization"
+        description = new Listing<String> { "Person"; "Organization" }
+      }
+    }
+  }
+
+  ["Person"] = new Description {
+    a = "foaf:Person"
+    label = "Person"
+    statements {
+      ["name"] = new LiteralStatement {
+        label = "Name"
+        property = "foaf:name"
+        min = 1
+        max = 1
+        datatype = "xsd:string"
+      }
+    }
+  }
+
+  ["Organization"] = new Description {
+    a = "foaf:Organization"
+    label = "Organization"
+    statements {
+      ["name"] = new LiteralStatement {
+        label = "Name"
+        property = "foaf:name"
+        min = 1
+        max = 1
+        datatype = "xsd:string"
+      }
+    }
+  }
+}

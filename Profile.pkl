@@ -143,9 +143,13 @@ class IriStatement extends Statement {
   /// Fixed to `"IRI"` — identifies this as an IRI statement.
   fixed `type`: "IRI" = "IRI"
 
-  /// Name of another description this statement references.
-  /// Creates a typed link to another described resource.
-  description: String?
+  /// Name(s) of other description(s) this statement references.
+  /// Creates a typed link to another described resource. Accepts a
+  /// single name (scalar) or a list of names (multi-shape disjunction).
+  /// Multi-shape renders as `sh:or` in SHACL, `(@<A> OR @<B>)` in ShEx,
+  /// `owl:unionOf` in OWL-DSP, and space-separated valueShape in DCTAP
+  /// (following the DCMI SRAP convention).
+  description: (String | Listing<String>)?
 
   /// Enumerated allowed URI values.
   values: Listing<String>?
@@ -162,9 +166,12 @@ class BnodeStatement extends Statement {
   /// Fixed to `"BNODE"` — identifies this as a blank-node statement.
   fixed `type`: "BNODE" = "BNODE"
 
-  /// Required name of the nested description defining the blank node's
-  /// structure.
-  description: String
+  /// Required name(s) of nested description(s) defining the blank
+  /// node's structure. Accepts a single name or a list of names. For
+  /// instance-data generation, the first entry is used (blank-node
+  /// generation is one-shot, not disjunctive); downstream constraint
+  /// languages render the full list as a disjunction.
+  description: (String | Listing<String>)
 }
 
 // ── Facets ──────────────────────────────────────────────────────

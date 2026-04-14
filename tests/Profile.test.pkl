@@ -46,6 +46,36 @@ local structuredProfile: YamaProfile = new YamaProfile {
   }
 }
 
+/// A profile exercising the multi-shape valueShape disjunction
+/// (DCMI SRAP-style). Renders to `description: [Person, Organization]`
+/// in YAMAML; to `sh:or`/`OR`/`owl:unionOf` in the constraint languages.
+local multiShapeProfile: YamaProfile = new YamaProfile {
+  descriptions {
+    ["Work"] = new YamaProfile.Description {
+      statements {
+        ["creator"] = new YamaProfile.IriStatement {
+          property = "dcterms:creator"
+          description = new Listing<String> { "Person"; "Organization" }
+        }
+      }
+    }
+    ["Person"] = new YamaProfile.Description {
+      statements {
+        ["name"] = new YamaProfile.LiteralStatement {
+          property = "foaf:name"
+        }
+      }
+    }
+    ["Organization"] = new YamaProfile.Description {
+      statements {
+        ["name"] = new YamaProfile.LiteralStatement {
+          property = "foaf:name"
+        }
+      }
+    }
+  }
+}
+
 facts {
   ["a minimal profile has descriptions"] {
     minimalProfile.descriptions.length > 0
@@ -77,5 +107,13 @@ facts {
 
   ["namespaces are preserved"] {
     structuredProfile.namespaces["foaf"] == "http://xmlns.com/foaf/0.1/"
+  }
+
+  ["IriStatement description accepts a single string"] {
+    structuredProfile.descriptions["person"].statements["knows"].description == "person"
+  }
+
+  ["IriStatement description accepts a list of strings"] {
+    multiShapeProfile.descriptions["Work"].statements["creator"].description.length == 2
   }
 }
