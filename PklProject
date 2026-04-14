@@ -9,7 +9,7 @@ amends "pkl:Project"
 
 package {
   name = "yama"
-  version = "0.1.0"
+  version = "0.2.0"
   baseUri = "package://pkg.pkl-lang.org/github.com/yamaml/yama-pkl/\(name)"
   packageZipUrl =
     "https://github.com/yamaml/yama-pkl/releases/download/\(name)@\(version)/\(name)@\(version).zip"
